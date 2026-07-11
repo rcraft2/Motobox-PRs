@@ -9,11 +9,12 @@
     "FeatureFlagsMixin",
     "FeatureManagerBuilderMixin",
     "ForgingScreenHandlerMixin",
+    "ModEntityDataSaverMixin",
     "ScreenHandlerMixin",
     "ServerPlayNetworkHandlerMixin"
   ],
   "client": [
-    "CameraMixin",
+    "CameraMixinMoto",
     "ClientPlayerEntityMixin",
     "ClientPlayerInteractionManagerMixin",
     "EntityRendererMixin",

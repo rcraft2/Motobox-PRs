@@ -34,6 +34,7 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.BoatEntity;
+import net.minecraft.item.DyeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
@@ -154,6 +155,8 @@ public class VehicleEntity extends BoatEntity implements RenderableVehicle, Enti
     private final Deque<Double> prevYDisplacements = new ArrayDeque<>();
 
     private boolean offRoad = false;
+
+    private int color = new Color(100,110,120).getRGB();
     private Color debrisColor = new Color(0, 0, 0);
 
     private int fallTicks = 0;
@@ -168,6 +171,7 @@ public class VehicleEntity extends BoatEntity implements RenderableVehicle, Enti
 
     public void writeSyncToClientData(PacketByteBuf buf) {
         buf.writeInt(boostTimer);
+        buf.writeInt(color);
         buf.writeFloat(steering);
         buf.writeFloat(wheelAngle);
         buf.writeInt(turboCharge);
@@ -181,6 +185,7 @@ public class VehicleEntity extends BoatEntity implements RenderableVehicle, Enti
 
     public void readSyncToClientData(PacketByteBuf buf) {
         boostTimer = buf.readInt();
+        color = buf.readInt();
         steering = buf.readFloat();
         wheelAngle = buf.readFloat();
         turboCharge = buf.readInt();
@@ -211,6 +216,7 @@ public class VehicleEntity extends BoatEntity implements RenderableVehicle, Enti
         engineSpeed = nbt.getFloat("engineSpeed");
         boostSpeed = nbt.getFloat("boostSpeed");
         boostTimer = nbt.getInt("boostTimer");
+        color = nbt.getInt("color");
         boostPower = nbt.getFloat("boostPower");
         speedDirection = nbt.getFloat("speedDirection");
         vSpeed = nbt.getFloat("verticalSpeed");
@@ -247,6 +253,7 @@ public class VehicleEntity extends BoatEntity implements RenderableVehicle, Enti
         nbt.putFloat("engineSpeed", engineSpeed);
         nbt.putFloat("boostSpeed", boostSpeed);
         nbt.putInt("boostTimer", boostTimer);
+        nbt.putInt("color", color);
         nbt.putFloat("boostPower", boostPower);
         nbt.putFloat("speedDirection", speedDirection);
         nbt.putFloat("verticalSpeed", vSpeed);
@@ -335,6 +342,17 @@ public class VehicleEntity extends BoatEntity implements RenderableVehicle, Enti
     @Override
     public VehicleEngine getEngine() {
         return engine;
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
+        if (this.getWorld() != null && !this.getWorld().isClient()) {
+            markDirty();
+        }
     }
 
     @Override
@@ -1406,6 +1424,25 @@ public class VehicleEntity extends BoatEntity implements RenderableVehicle, Enti
         }
 
         if (!decorative) {
+            if (stack.getItem() instanceof DyeItem dyeItem && frame.model().modelId().equals(id("frame_veloce_v8"))) {
+                if (player.getWorld().isClient()) {
+                    return ActionResult.SUCCESS;
+                }
+
+                float[] components = dyeItem.getColor().getColorComponents();
+                int red = Math.round(components[0] * 255);
+                int green = Math.round(components[1] * 255);
+                int blue = Math.round(components[2] * 255);
+                int rgb = (red << 16) | (green << 8) | blue;
+
+                this.setColor(rgb);
+                this.playHitSound();
+                if (!player.isCreative()) {
+                    stack.decrement(1);
+                }
+                return ActionResult.SUCCESS;
+            }
+
             if (stack.getItem() instanceof VehicleInteractable interactable) {
                 return interactable.interactVehicle(stack, player, hand, this);
             }
@@ -1526,6 +1563,30 @@ public class VehicleEntity extends BoatEntity implements RenderableVehicle, Enti
             } else if (getPassengerList().size() >= 4 && passenger == getPassengerList().get(3)) {
                 pos = getPos().add(0.0, displacement.verticalTarget + passenger.getHeightOffset(), 0.0)
                         .add(new Vec3d(-0.6, getMountedHeightOffset(), 0.8)
+                                .rotateY((float) Math.toRadians((180.0f - getYaw())))
+                                .rotateX((float) Math.toRadians((getPitch())))
+                                .rotateX((float) Math.toRadians(-displacement.currAngularX))
+                                .rotateZ((float) Math.toRadians(-displacement.currAngularZ))
+                        );
+                passenger.setPosition(pos.x, pos.y, pos.z);
+            } else if (hasPassenger(passenger)) {
+                pos = getPos().add(
+                        new Vec3d(0.0, displacement.verticalTarget, getFrame().model().rearAttachmentPos().getFloat() * 0.0625)
+                                .rotateY((float) Math.toRadians((180.0f - getYaw())))
+                                .add(0.0, rearAttachment.getPassengerHeightOffset() + passenger.getHeightOffset() - 0.14, 0.0)
+                                .add(rearAttachment.scaledYawVec())
+                                .rotateX((float) Math.toRadians(-displacement.currAngularX))
+                                .rotateZ((float) Math.toRadians(-displacement.currAngularZ))
+                );
+                passenger.setPosition(pos.x, pos.y, pos.z);
+            }
+            return;
+        }
+        if (Objects.equals(frame.getId(), id("veloce_e1"))) {
+            Vec3d pos;
+            if (Objects.equals(passenger, getFirstPassenger())) {
+                pos = getPos().add(0.0, displacement.verticalTarget + passenger.getHeightOffset(), 0.0)
+                        .add(new Vec3d(0, getMountedHeightOffset(), 0.35)
                                 .rotateY((float) Math.toRadians((180.0f - getYaw())))
                                 .rotateX((float) Math.toRadians((getPitch())))
                                 .rotateX((float) Math.toRadians(-displacement.currAngularX))

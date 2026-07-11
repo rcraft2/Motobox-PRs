@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "motobox:block/slot_machine"
+    },
+    "facing=south": {
+      "model": "motobox:block/slot_machine",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "motobox:block/slot_machine",
+      "y": 90
+    },
+    "facing=west": {
+      "model": "motobox:block/slot_machine",
+      "y": 270
+    }
+  }
+}

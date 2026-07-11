@@ -152,4 +152,9 @@ public class ItemRenderableVehicle implements RenderableVehicle {
     public Color debrisColor() {
         return new Color(0, 0, 0);
     }
+
+    @Override
+    public int getColor() {
+        return 0;
+    }
 }

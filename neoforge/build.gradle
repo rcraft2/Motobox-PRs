@@ -1,0 +1,76 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'net.neoforged.gradle.userdev' version '7.0.165'
+}
+
+group = mod_group
+version = mod_version
+
+base {
+    archivesName = mod_id
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+    withSourcesJar()
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "net.neoforged:neoforge:${neo_version}"
+}
+
+runs {
+    configureEach {
+        modSource sourceSets.main
+        workingDirectory file('../run')
+    }
+
+    client { }
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDir 'src/main/resources'
+            srcDir '../src/main/resources'
+            exclude 'fabric.mod.json'
+            exclude 'motobox.mixins.json'
+            exclude 'motobox.accesswidener'
+        }
+    }
+}
+
+tasks.withType(ProcessResources).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    var replaceProperties = [
+            mod_id         : mod_id,
+            mod_name       : mod_name,
+            mod_version    : mod_version,
+            mod_authors    : mod_authors,
+            mod_description: mod_description,
+            minecraft_version: minecraft_version
+    ]
+    inputs.properties replaceProperties
+
+    filesMatching(['META-INF/neoforge.mods.toml', 'pack.mcmeta']) {
+        expand replaceProperties
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 21
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}

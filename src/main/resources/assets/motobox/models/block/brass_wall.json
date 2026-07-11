@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/template_wall",
+  "textures": {
+    "wall": "motobox:block/brass_block"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "motobox:block/work_laptop"
+    },
+    "facing=south": {
+      "model": "motobox:block/work_laptop",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "motobox:block/work_laptop",
+      "y": 90
+    },
+    "facing=west": {
+      "model": "motobox:block/work_laptop",
+      "y": 270
+    }
+  }
+}

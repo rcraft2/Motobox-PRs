@@ -1,5 +1,10 @@
 package motobox.vehicle;
 
+import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 import motobox.Motobox;
 import motobox.render.MotoboxModels;
 import motobox.sound.MotoboxSounds;
@@ -13,33 +18,36 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 
-import java.util.Objects;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 public final class VehicleEngine implements VehicleComponent<VehicleEngine> {
     public static final Identifier ID = Motobox.id("engine");
     public static final SimpleMapContentRegistry<VehicleEngine> REGISTRY = new SimpleMapContentRegistry<>();
 
     public static final VehicleEngine EMPTY = REGISTRY.register(
-            new VehicleEngine(Motobox.id("empty"), 0.01f, 0.01f,
+            new VehicleEngine(Motobox.id("empty"), 0.01f, 0.01f, 0.0,
                     SoundEvents.ENTITY_MINECART_INSIDE,
                     new EngineModel(new Identifier("empty"), Motobox.id("empty"))
             )
     );
 
     public static final VehicleEngine DIESEL_FOUR_CYLINDER_ENGINE = REGISTRY.register(
-            new VehicleEngine(Motobox.id("diesel_four_cylinder"), 0.55f, 1.2f,
+            new VehicleEngine(Motobox.id("diesel_four_cylinder"), 3.95f, 1.2f, 3875.76,
                     MotoboxSounds.DIESEL_FOUR_CYLINDER_ENGINE,
                     new EngineModel(
                             Motobox.id("textures/entity/vehicle/engine/diesel_four_cylinder_engine.png"), Motobox.id("diesel_four_cylinder_engine")
                     )
             )
     );
+    public static final VehicleEngine VRD_ENGINE = REGISTRY.register(
+            new VehicleEngine(Motobox.id("vrd_engine_"), 4.25f, 3.2f, 7699.68,
+                    MotoboxSounds.DIESEL_FOUR_CYLINDER_ENGINE,
+                    new EngineModel(
+                            Motobox.id("textures/entity/vehicle/engine/engine.png"), Motobox.id("vrd_engine")
+                    )
+            )
+    );
 
     public static final VehicleEngine MOTORBIKE_ENGINE = REGISTRY.register(
-            new VehicleEngine(Motobox.id("motorbike"), 0.6f, 0.8f,
+            new VehicleEngine(Motobox.id("motorbike"), 0.6f, 0.8f, 0.0,
                     MotoboxSounds.MOTORBIKE_ENGINE,
                     new EngineModel(
                             Motobox.id("textures/entity/vehicle/engine/motorbike_engine.png"), Motobox.id("motorbike_engine")
@@ -49,9 +57,11 @@ public final class VehicleEngine implements VehicleComponent<VehicleEngine> {
 
     public static final DisplayStat<VehicleEngine> STAT_TORQUE = new DisplayStat<>("torque", VehicleEngine::torque);
     public static final DisplayStat<VehicleEngine> STAT_SPEED = new DisplayStat<>("speed", VehicleEngine::speed);
+    public static final DisplayStat<VehicleEngine> STAT_ENGINE_PRICE = new DisplayStat<>("price", VehicleEngine::price);
     private final Identifier id;
     private final float torque;
     private final float speed;
+    private final double price;
     private final SoundEvent sound;
     private final EngineModel model;
     private final Supplier<FeatureSet> requiredFeatures;
@@ -60,16 +70,18 @@ public final class VehicleEngine implements VehicleComponent<VehicleEngine> {
             Identifier id,
             float torque,
             float speed,
+            double price,
             SoundEvent sound,
             EngineModel model
     ) {
-        this(id, torque, speed, sound, model, FeatureSet::empty);
+        this(id, torque, speed, price, sound, model, FeatureSet::empty);
     }
 
     public VehicleEngine(
             Identifier id,
             float torque,
             float speed,
+            double price,
             SoundEvent sound,
             EngineModel model,
             Supplier<FeatureSet> requiredFeatures
@@ -77,6 +89,7 @@ public final class VehicleEngine implements VehicleComponent<VehicleEngine> {
         this.id = id;
         this.torque = torque;
         this.speed = speed;
+        this.price = price;
         this.sound = sound;
         this.model = model;
         this.requiredFeatures = requiredFeatures;
@@ -96,6 +109,7 @@ public final class VehicleEngine implements VehicleComponent<VehicleEngine> {
     public void forEachStat(Consumer<DisplayStat<VehicleEngine>> action) {
         action.accept(STAT_TORQUE);
         action.accept(STAT_SPEED);
+        action.accept(STAT_ENGINE_PRICE);
     }
 
     @Override
@@ -117,6 +131,9 @@ public final class VehicleEngine implements VehicleComponent<VehicleEngine> {
 
     public float speed() {
         return speed;
+    }
+    public double price() {
+        return price;
     }
 
     public SoundEvent sound() {

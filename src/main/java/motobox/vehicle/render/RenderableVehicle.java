@@ -75,4 +75,6 @@ public interface RenderableVehicle {
     boolean debris();
 
     Color debrisColor();
+
+    int getColor();
 }

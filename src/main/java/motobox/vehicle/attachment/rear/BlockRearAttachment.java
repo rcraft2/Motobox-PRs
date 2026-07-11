@@ -101,6 +101,24 @@ public class BlockRearAttachment extends RearAttachment {
             }
         };
     }
+    public static RearAttachment spoiler1(RearAttachmentType<?> type, VehicleEntity entity) {
+        return new RearAttachment(type, entity) {
+            @Override
+            public boolean hasMenu() {
+                return false;
+            }
+
+            @Override
+            public @Nullable NamedScreenHandlerFactory createMenu(ScreenHandlerContext ctx) {
+                return super.createMenu(ctx);
+            }
+        };
+    }
+    public static BlockRearAttachment spoil(RearAttachmentType<?> type, VehicleEntity entity) {
+        return new ChestRearAttachment(type, entity,
+                Blocks.ENDER_CHEST.getDefaultState(),
+                (ctx, att) -> att instanceof ChestRearAttachment chest ? chest : null);
+    }
 
     public static BlockRearAttachment mechanicTable(RearAttachmentType<?> type, VehicleEntity entity) {
         return new BlockRearAttachment(type, entity,

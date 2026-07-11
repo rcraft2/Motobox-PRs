@@ -1,5 +1,6 @@
 package motobox.block.entity;
 
+import io.netty.buffer.Unpooled;
 import motobox.block.MotoboxBlocks;
 import motobox.block.VehicleAssemblerBlock;
 import motobox.entity.VehicleEntity;
@@ -7,6 +8,9 @@ import motobox.item.MotoboxItems;
 import motobox.item.VehicleEngineItem;
 import motobox.item.VehicleFrameItem;
 import motobox.item.VehicleWheelItem;
+import motobox.networking.ModMessages;
+import motobox.util.IEntityDataSaver;
+import motobox.util.MoneyData;
 import motobox.vehicle.VehicleEngine;
 import motobox.vehicle.VehicleFrame;
 import motobox.vehicle.VehicleStats;
@@ -18,6 +22,8 @@ import motobox.vehicle.attachment.rear.RearAttachment;
 import motobox.vehicle.render.RenderableVehicle;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.model.Model;
@@ -26,6 +32,9 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
@@ -65,6 +74,9 @@ public class VehicleAssemblerBlockEntity extends BlockEntity implements Renderab
     protected VehicleEngine engine = VehicleEngine.EMPTY;
     protected VehicleWheel wheel = VehicleWheel.EMPTY;
     protected int wheelCount = 0;
+    protected boolean ownedFrame;
+    protected boolean ownedEngine;
+    protected double price = 0.00;
 
     public final List<Text> label = new ArrayList<>();
     protected final VehicleStats stats = new VehicleStats();
@@ -199,13 +211,12 @@ public class VehicleAssemblerBlockEntity extends BlockEntity implements Renderab
     public ActionResult interact(PlayerEntity player, Hand hand) {
         var stack = player.getStackInHand(hand);
         var result = this.handleItemInteract(player, stack);
-
         if (!this.world.isClient() && result == ActionResult.SUCCESS) {
             if (!isComplete()) {
                 world.playSound(null, this.pos, SoundEvents.BLOCK_COPPER_PLACE, SoundCategory.BLOCKS, 0.7f, 0.6f + (this.world.random.nextFloat() * 0.15f));
             }
 
-            tryConstructVehicle();
+            tryConstructVehicle((IEntityDataSaver)player);
             return ActionResult.SUCCESS;
         }
         return result;
@@ -221,22 +232,58 @@ public class VehicleAssemblerBlockEntity extends BlockEntity implements Renderab
                 ((!this.wheel.isEmpty()) && (this.wheelCount == this.frame.model().wheelBase().get().wheelCount));
     }
 
-    public void tryConstructVehicle() {
+    public double vehiclePrice(IEntityDataSaver play) {
+        double frame = this.frame.price();
+        double engine = this.engine.price();
+        ownedFrame = false;
+        ownedEngine = false;
+        NbtList list = play.getPersistentData().getList("ownedcars",8);
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println(list.getString(i));
+            if (list.getString(i).equals(this.frame.model().modelId().toString())) {
+                frame = 200;
+                ownedFrame = true;
+            } else if (list.getString(i).equals(this.engine.model().modelId().toString())) {
+                engine = 100;
+                ownedEngine = true;
+            }
+        }
+        return frame + engine;
+    }
+
+    public void tryConstructVehicle(IEntityDataSaver play) {
         if (this.isComplete()) {
-            var pos = this.centerPos();
-            var vehicle = new VehicleEntity(this.world);
-            vehicle.refreshPositionAndAngles(pos.x, pos.y, pos.z, this.getVehicleYaw(0), 0);
-            vehicle.setComponents(this.frame, this.wheel, this.engine);
-            world.spawnEntity(vehicle);
-
-            world.getPlayers().forEach(p -> {
-                if (p instanceof ServerPlayerEntity player && p.getBlockPos().getSquaredDistance(this.pos) < 80000) {
-                    player.networkHandler.sendPacket(new ParticleS2CPacket(ParticleTypes.EXPLOSION, false, pos.x, pos.y + 0.47, pos.z, 0, 0, 0, 0, 1));
+            double price = vehiclePrice(play);
+            if (play.getPersistentData().getDouble("money") >= price) {
+                var pos = this.centerPos();
+                var vehicle = new VehicleEntity(this.world);
+                vehicle.refreshPositionAndAngles(pos.x, pos.y, pos.z, this.getVehicleYaw(0), 0);
+                vehicle.setComponents(this.frame, this.wheel, this.engine);
+                MoneyData.removeMoney(play, price);
+                world.spawnEntity(vehicle);
+                if (!ownedFrame) {
+                    NbtList list = play.getPersistentData().getList("ownedcars", 8);
+                    list.add(NbtString.of(this.frame.model().modelId().toString()));
+                    play.getPersistentData().put("ownedcars", list);
                 }
-            });
-            world.playSound(null, this.pos, SoundEvents.BLOCK_ANVIL_PLACE, SoundCategory.BLOCKS, 0.23f, 0.5f);
+                if (!ownedEngine) {
+                    NbtList list = play.getPersistentData().getList("ownedcars", 8);
+                    list.add(NbtString.of(this.engine.model().modelId().toString()));
+                    play.getPersistentData().put("ownedcars", list);
+                }
 
-            this.clear();
+                world.getPlayers().forEach(p -> {
+                    if (p instanceof ServerPlayerEntity player && p.getBlockPos().getSquaredDistance(this.pos) < 80000) {
+                        player.networkHandler.sendPacket(new ParticleS2CPacket(ParticleTypes.EXPLOSION, false, pos.x, pos.y + 0.47, pos.z, 0, 0, 0, 0, 1));
+                    }
+                });
+                world.playSound(null, this.pos, SoundEvents.BLOCK_ANVIL_PLACE, SoundCategory.BLOCKS, 0.23f, 0.5f);
+
+                this.clear();
+            }
+            else {
+                ((PlayerEntity)play).sendMessage(Text.literal("Not enough money, poor boy."));
+            }
         }
     }
 
@@ -391,5 +438,10 @@ public class VehicleAssemblerBlockEntity extends BlockEntity implements Renderab
     @Override
     public Color debrisColor() {
         return null;
+    }
+
+    @Override
+    public int getColor() {
+        return 0;
     }
 }

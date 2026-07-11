@@ -1,0 +1,22 @@
+{
+  "variants": {
+    "": {
+      "model": "motobox:block/race_trophy"
+    },
+    "facing=north": {
+      "model": "motobox:block/race_trophy"
+    },
+    "facing=south": {
+      "model": "motobox:block/race_trophy",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "motobox:block/race_trophy",
+      "y": 90
+    },
+    "facing=west": {
+      "model": "motobox:block/race_trophy",
+      "y": 270
+    }
+  }
+}

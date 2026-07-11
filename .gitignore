@@ -31,3 +31,7 @@ bin/
 # fabric
 
 run/
+
+# external editable upstream sources
+
+external/

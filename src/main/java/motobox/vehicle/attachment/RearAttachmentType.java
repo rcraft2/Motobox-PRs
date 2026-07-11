@@ -8,9 +8,7 @@ import motobox.render.MotoboxModels;
 import motobox.util.SimpleMapContentRegistry;
 import motobox.vehicle.DisplayStat;
 import motobox.vehicle.VehicleComponent;
-import motobox.vehicle.attachment.rear.BaseChestRearAttachment;
-import motobox.vehicle.attachment.rear.EmptyRearAttachment;
-import motobox.vehicle.attachment.rear.RearAttachment;
+import motobox.vehicle.attachment.rear.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.model.Model;
@@ -34,6 +32,8 @@ public final class RearAttachmentType<T extends RearAttachment> implements Vehic
 
     public static final RearAttachmentType<BaseChestRearAttachment> TRAILER = register(new RearAttachmentType<>(Motobox.id("trailer"),
             BaseChestRearAttachment::chest, new RearAttachmentModel(Motobox.id("textures/entity/vehicle/rear_attachment/trailer.png"), Motobox.id("rearatt_trailer"), () -> 3, () -> 1 / 2f)));
+    public static final RearAttachmentType<Spoiler1> SPOILER1 = register(new RearAttachmentType<>(Motobox.id("spoiler1"),
+            Spoiler1::new, new RearAttachmentModel(Motobox.id("textures/entity/vehicle/rear_attachment/spoiler1.png"), Motobox.id("rearatt_spoiler1"), () -> 0, () -> 0f)));
 
     public static final RearAttachmentType<BaseChestRearAttachment> CARAVAN = register(new RearAttachmentType<>(Motobox.id("caravan"),
             BaseChestRearAttachment::saddledBarrel, new RearAttachmentModel(Motobox.id("textures/entity/vehicle/rear_attachment/caravan.png"), Motobox.id("rearatt_caravan"), () -> 3, () -> 1 / 4f), () -> FeatureSet.of(MotoboxFeatureFlags.CARAVAN)));

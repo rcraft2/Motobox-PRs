@@ -32,6 +32,11 @@ repositories {
 	maven { url "https://api.modrinth.com/maven" }
 	maven { url "https://storage.googleapis.com/devan-maven/" }
 	maven { url "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/" }
+	maven { url 'https://jitpack.io' }
+	maven {
+		name "azuredoomModsMods"
+		url "https://maven.azuredoom.com/"
+	}
 
 	maven {
 		url "https://cursemaven.com"
@@ -74,6 +79,12 @@ dependencies {
 //	include "maven.modrinth:jsonem:${project.jsonem_version}"
 
 	modImplementation("net.fabricmc:fabric-language-kotlin:1.10.17+kotlin.1.9.22")
+	modImplementation files("libs/azurelib-fabric-1.20.1-${project.azurelib_version}.jar")
+//	modImplementation("animated_guns:SimpleAnimatedGuns:1.3")
+	include implementation("com.github.Chocohead:Fabric-ASM:v2.3")
+	modImplementation "curse.maven:fabric-simple-animated-guns-664917:5547258"
+	modImplementation files("libs/immersive_aircraft-1.1.2+1.20.1-fabric.jar")
+	modImplementation("org.mariuszgromada.math:MathParser.org-mXparser:5.2.1")
 
 	modImplementation "com.terraformersmc:modmenu:7.2.2", {
 		exclude module: "fabric-api"
@@ -85,6 +96,10 @@ dependencies {
 
 processResources {
 	inputs.property "version", project.version
+
+	// Keep Blockbench project files out of runtime assets.
+	// Some mods scan all .bbmodel resources and may crash on editor-only schemas.
+	exclude("**/*.bbmodel")
 
 	filesMatching("fabric.mod.json") {
 		expand "version": project.version
@@ -136,4 +151,13 @@ publishing {
 		// The repositories here will be used for publishing your artifact, not for
 		// retrieving dependencies.
 	}
+}
+
+def neoForgeWrapper = System.getProperty("os.name").toLowerCase().contains("windows") ? "gradlew.bat" : "./gradlew"
+
+tasks.register("runNeoClient", Exec) {
+	group = "neoforge"
+	description = "Runs the NeoForge client from the root project."
+	workingDir = file("neoforge")
+	commandLine neoForgeWrapper, "runClient"
 }

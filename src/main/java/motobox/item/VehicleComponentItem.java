@@ -6,6 +6,7 @@ import motobox.vehicle.VehicleEngine;
 import motobox.vehicle.VehicleWheel;
 import motobox.vehicle.attachment.RearAttachmentType;
 import motobox.vehicle.attachment.rear.TrailerRearAttachment;
+import motobox.vehicle.attachment.rear.Spoiler1;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
@@ -104,6 +105,10 @@ public class VehicleComponentItem<T extends VehicleComponent<T>> extends Item {
 
                 if (component instanceof RearAttachmentType<?> attachment && attachment == RearAttachmentType.TRAILER) {
                     matrices.translate(0, -0.5F, -2);
+                }
+
+                if (component instanceof RearAttachmentType<?> attachment && attachment == RearAttachmentType.SPOILER1) {
+                    matrices.translate(0, 0F, 0);
                 }
 
                 if (component instanceof VehicleEngine engine && engine == VehicleEngine.MOTORBIKE_ENGINE) {

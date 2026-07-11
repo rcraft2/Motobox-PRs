@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "type=bottom": { "model": "motobox:block/brass_slab" },
+    "type=top": { "model": "motobox:block/brass_slab_top" },
+    "type=double": { "model": "motobox:block/brass_block" }
+  }
+}

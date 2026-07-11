@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "motobox:block/roulette_table" },
+    "facing=south": { "model": "motobox:block/roulette_table", "y": 180 },
+    "facing=west":  { "model": "motobox:block/roulette_table", "y": 270 },
+    "facing=east":  { "model": "motobox:block/roulette_table", "y": 90 }
+  }
+}

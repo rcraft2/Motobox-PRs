@@ -1,7 +1,17 @@
 package motobox.block;
 
 import motobox.Motobox;
+import motobox.block.brass.BrassBlock;
+import motobox.block.brass.BrassSlab;
+import motobox.block.brass.BrassStair;
+import motobox.block.brass.BrassWall;
+import motobox.block.ElevatorDoorBlock;
+import motobox.block.entity.ElevatorDoorBlockEntity;
 import motobox.block.entity.VehicleAssemblerBlockEntity;
+import motobox.block.entity.WorkLaptop;
+import motobox.block.entity.WorkLaptopEntity;
+import motobox.block.entity.SlotMachine;
+import motobox.block.entity.SlotMachineEntity;
 import motobox.item.SlopeBlockItem;
 import motobox.item.SteepSlopeBlockItem;
 import motobox.item.TooltipBlockItem;
@@ -36,7 +46,13 @@ public enum MotoboxBlocks {
     ;
     public static final Block MECHANIC_TABLE = register("mechanic_table", new MechanicTableBlock(FabricBlockSettings.copyOf(Blocks.COPPER_BLOCK).nonOpaque()), MotoboxBlocks::simpleItem);
 
+    public static final Block WORK_LAPTOP = register("work_laptop", new WorkLaptop(FabricBlockSettings.copyOf(Blocks.COPPER_BLOCK).nonOpaque()), MotoboxBlocks::simpleItem);
+
+    public static final Block SLOT_MACHINE = register("slot_machine", new SlotMachine(FabricBlockSettings.copyOf(Blocks.COPPER_BLOCK).nonOpaque()), MotoboxBlocks::simpleItem);
+
     public static final Block VEHICLE_ASSEMBLER = register("vehicle_assembler", new VehicleAssemblerBlock(FabricBlockSettings.copyOf(Blocks.ANVIL)), MotoboxBlocks::simpleItem);
+
+    public static final Block ELEVATOR_DOOR = register("elevator_door", new ElevatorDoorBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque().noCollision()), MotoboxBlocks::simpleItem);
 
     public static final Block LAUNCH_GEL = register("launch_gel", new LaunchGelBlock(FabricBlockSettings.copyOf(Blocks.GLOW_LICHEN).sounds(BlockSoundGroup.HONEY).noCollision()), MotoboxBlocks::simpleItem);
 
@@ -50,6 +66,7 @@ public enum MotoboxBlocks {
 
     public static final Block ASPHALT = register("asphalt", new AsphaltBlock(FabricBlockSettings.create().mapColor(MapColor.BLACK).requiresTool().strength(1.5f, 6.0f)), MotoboxBlocks::simpleItem);
     public static final Block TRAFFIC_CONE = register("traffic_cone", new TrafficConeBlock(FabricBlockSettings.copyOf(Blocks.STONE).strength(0.5f, 2.0f)), MotoboxBlocks::simpleItem);
+    public static final Block RACE_TROPHY = register("race_trophy", new RaceTrophyBlock(FabricBlockSettings.copyOf(Blocks.STONE).strength(0.5f, 2.0f).sounds(BlockSoundGroup.GLASS)), MotoboxBlocks::simpleItem);
     public static final Block ROADBLOCK = register("roadblock", new RoadblockBlock(FabricBlockSettings.copyOf(Blocks.GRAY_CONCRETE).requiresTool().strength(2.0f, 6.0f)), MotoboxBlocks::simpleItem);
 
 
@@ -58,8 +75,29 @@ public enum MotoboxBlocks {
     public static final Block SLOPED_DASH_PANEL = register("sloped_dash_panel", new SlopedDashPanelBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).luminance(1).emissiveLighting((state, world, pos) -> true)));
     public static final Block STEEP_SLOPED_DASH_PANEL = register("steep_sloped_dash_panel", new SteepSlopedDashPanelBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).luminance(1).emissiveLighting((state, world, pos) -> true)));
 
+    public static final Block BRASS_BLOCK = register("brass_block", new Block(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK)),MotoboxBlocks::simpleItem);
+    public static final Block BRASS_SlAB = register("brass_slab", new SlabBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK)),MotoboxBlocks::simpleItem);
+    public static final Block BRASS_WALL = register("brass_wall", new WallBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK)),MotoboxBlocks::simpleItem);
+    public static final Block BRASS_STAIR = register("brass_stair", new StairsBlock(BRASS_BLOCK.getDefaultState(),FabricBlockSettings.copyOf(Blocks.IRON_BLOCK)),MotoboxBlocks::simpleItem);
+
+    //All furniture here:
+    public static final Block MODERN_LAMP_1 = register("modern_lamp_1", new ModernLamp1(FabricBlockSettings.copyOf(Blocks.STONE).strength(0.5f, 2.0f).sounds(BlockSoundGroup.GLASS).luminance(value -> 10).emissiveLighting((state, world, pos) -> true)), MotoboxBlocks::simpleItem);
+    public static final Block TABLE_1 = register("table_1", new Table1(FabricBlockSettings.copyOf(Blocks.STONE).strength(0.5f, 2.0f)), MotoboxBlocks::simpleItem);
+    public static final Block ROULETTE_WHEEL = register("roulette_wheel", new RouletteWheelBlock(FabricBlockSettings.copyOf(Blocks.STONE).strength(0.5f, 2.0f)), MotoboxBlocks::simpleItem);
+    public static final Block ROULETTE_TABLE = register("roulette_table", new RouletteTableBlock(FabricBlockSettings.copyOf(Blocks.STONE).strength(0.5f, 2.0f)), MotoboxBlocks::simpleItem);
+    public static final Block COUCH_1 = register("couch_1", new Couch1(FabricBlockSettings.copyOf(Blocks.STONE).strength(0.5f, 2.0f)), MotoboxBlocks::simpleItem);
+    public static final Block COUCH_1_FLIP = register("couch_1_flip", new Couch1_flip(FabricBlockSettings.copyOf(Blocks.STONE).strength(0.5f, 2.0f)), MotoboxBlocks::simpleItem);
+    public static final Block BLACKJACK = register("blackjack", new BlackjackBlock(FabricBlockSettings.copyOf(Blocks.STONE).strength(0.5f, 2.0f)), MotoboxBlocks::simpleItem);
+
     public static final BlockEntityType<VehicleAssemblerBlockEntity> VEHICLE_ASSEMBLER_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE,
             Motobox.id("vehicle_assembler"), FabricBlockEntityTypeBuilder.create(VehicleAssemblerBlockEntity::new, VEHICLE_ASSEMBLER).build());
+        public static final BlockEntityType<ElevatorDoorBlockEntity> ELEVATOR_DOOR_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE,
+            Motobox.id("elevator_door"), FabricBlockEntityTypeBuilder.create(ElevatorDoorBlockEntity::new, ELEVATOR_DOOR).build());
+    public static final BlockEntityType<WorkLaptopEntity> LAPTOP_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE,
+            Motobox.id("work_laptop"), FabricBlockEntityTypeBuilder.create(WorkLaptopEntity::new, WORK_LAPTOP).build());
+    public static final BlockEntityType<SlotMachineEntity> SLOT_MACHINE_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE,
+            Motobox.id("slot_machine"), FabricBlockEntityTypeBuilder.create(SlotMachineEntity::new, SLOT_MACHINE).build());
+
 
     public static void init() {
         Registry.register(Registries.ITEM, Motobox.id("sloped_dash_panel"), new SlopeBlockItem(null, SLOPED_DASH_PANEL, new Item.Settings()));

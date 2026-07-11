@@ -1,7 +1,10 @@
 package motobox.item;
 
+import immersive_aircraft.item.DyeableAircraftItem;
 import motobox.Motobox;
 import motobox.common.ToFloatFunctionImpl;
+import motobox.entity.MotoboxEntities;
+import motobox.entity.planes.TexanPlaneEntity;
 import motobox.util.EntityRenderHelper;
 import motobox.util.SimpleMapContentRegistry;
 import motobox.vehicle.attachment.FrontAttachmentType;
@@ -20,10 +23,12 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.DyeColor;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public enum MotoboxItems {
     ;
@@ -35,13 +40,45 @@ public enum MotoboxItems {
     public static final FrontAttachmentItem FRONT_ATTACHMENT = register("front_attachment", new FrontAttachmentItem(new Item.Settings().maxCount(1)));
     public static final RearAttachmentItem REAR_ATTACHMENT = register("rear_attachment", new RearAttachmentItem(new Item.Settings().maxCount(1)));
 
+    public static final Item FOOTBALL = register("football", new FootballItem(new Item.Settings().maxCount(16)));
+
+    // Vehicle Dye Items
+    public static final Item VEHICLE_DYE_WHITE = register("vehicle_dye_white", new VehicleDyeItem(DyeColor.WHITE, new Item.Settings()));
+    public static final Item VEHICLE_DYE_ORANGE = register("vehicle_dye_orange", new VehicleDyeItem(DyeColor.ORANGE, new Item.Settings()));
+    public static final Item VEHICLE_DYE_MAGENTA = register("vehicle_dye_magenta", new VehicleDyeItem(DyeColor.MAGENTA, new Item.Settings()));
+    public static final Item VEHICLE_DYE_LIGHT_BLUE = register("vehicle_dye_light_blue", new VehicleDyeItem(DyeColor.LIGHT_BLUE, new Item.Settings()));
+    public static final Item VEHICLE_DYE_YELLOW = register("vehicle_dye_yellow", new VehicleDyeItem(DyeColor.YELLOW, new Item.Settings()));
+    public static final Item VEHICLE_DYE_LIME = register("vehicle_dye_lime", new VehicleDyeItem(DyeColor.LIME, new Item.Settings()));
+    public static final Item VEHICLE_DYE_PINK = register("vehicle_dye_pink", new VehicleDyeItem(DyeColor.PINK, new Item.Settings()));
+    public static final Item VEHICLE_DYE_GRAY = register("vehicle_dye_gray", new VehicleDyeItem(DyeColor.GRAY, new Item.Settings()));
+    public static final Item VEHICLE_DYE_LIGHT_GRAY = register("vehicle_dye_light_gray", new VehicleDyeItem(DyeColor.LIGHT_GRAY, new Item.Settings()));
+    public static final Item VEHICLE_DYE_CYAN = register("vehicle_dye_cyan", new VehicleDyeItem(DyeColor.CYAN, new Item.Settings()));
+    public static final Item VEHICLE_DYE_PURPLE = register("vehicle_dye_purple", new VehicleDyeItem(DyeColor.PURPLE, new Item.Settings()));
+    public static final Item VEHICLE_DYE_BLUE = register("vehicle_dye_blue", new VehicleDyeItem(DyeColor.BLUE, new Item.Settings()));
+    public static final Item VEHICLE_DYE_BROWN = register("vehicle_dye_brown", new VehicleDyeItem(DyeColor.BROWN, new Item.Settings()));
+    public static final Item VEHICLE_DYE_GREEN = register("vehicle_dye_green", new VehicleDyeItem(DyeColor.GREEN, new Item.Settings()));
+    public static final Item VEHICLE_DYE_RED = register("vehicle_dye_red", new VehicleDyeItem(DyeColor.RED, new Item.Settings()));
+    public static final Item VEHICLE_DYE_BLACK = register("vehicle_dye_black", new VehicleDyeItem(DyeColor.BLACK, new Item.Settings()));
+
+    public static Item TEXAN_PLANE_ITEM;
+
     public static void init() {
+        if (TEXAN_PLANE_ITEM == null) {
+            try {
+                TEXAN_PLANE_ITEM = new_register("texan_plane", () -> new DyeableAircraftItem(new Item.Settings().maxCount(1), world -> new TexanPlaneEntity(MotoboxEntities.TEXAN_ENTITY, world)));
+            } catch (Throwable t) {
+                // Fallback prevents hard-crash if immersive-aircraft registration is not ready yet.
+                TEXAN_PLANE_ITEM = register("texan_plane", new Item(new Item.Settings().maxCount(1)));
+            }
+        }
+
         VehicleItem.addPrefabs(
                 new VehiclePrefab(Motobox.id("truck"), VehicleFrame.TRUCK, VehicleWheel.SLEEK_RED_OFFROAD, VehicleEngine.DIESEL_FOUR_CYLINDER_ENGINE),
                 new VehiclePrefab(Motobox.id("motorbike"), VehicleFrame.MOTORBIKE, VehicleWheel.MOTORBIKE, VehicleEngine.MOTORBIKE_ENGINE),
                 new VehiclePrefab(Motobox.id("rusty_car"), VehicleFrame.RUSTY_CAR, VehicleWheel.RUSTY_STEEL, VehicleEngine.DIESEL_FOUR_CYLINDER_ENGINE)
         );
     }
+
 
     @Environment(EnvType.CLIENT)
     private static EntityRendererFactory.Context cachedCtx;
@@ -113,5 +150,9 @@ public enum MotoboxItems {
 
     public static <T extends Item> T register(String name, T item) {
         return Registry.register(Registries.ITEM, Motobox.id(name), item);
+    }
+
+    private static Item new_register(String name, Supplier<Item> itemSupplier) {
+        return Registry.register(Registries.ITEM, Motobox.id(name), itemSupplier.get());
     }
 }

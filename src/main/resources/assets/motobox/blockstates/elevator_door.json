@@ -1,0 +1,20 @@
+{
+  "multipart": [
+    {
+      "when": { "facing": "north" },
+      "apply": { "model": "motobox:block/elevator_door" }
+    },
+    {
+      "when": { "facing": "south" },
+      "apply": { "model": "motobox:block/elevator_door", "y": 180 }
+    },
+    {
+      "when": { "facing": "west" },
+      "apply": { "model": "motobox:block/elevator_door", "y": 90 }
+    },
+    {
+      "when": { "facing": "east" },
+      "apply": { "model": "motobox:block/elevator_door", "y": 270 }
+    }
+  ]
+}

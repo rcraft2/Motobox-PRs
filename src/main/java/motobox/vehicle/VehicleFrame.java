@@ -1,5 +1,10 @@
 package motobox.vehicle;
 
+import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 import motobox.Motobox;
 import motobox.common.FloatSupplier;
 import motobox.render.MotoboxModels;
@@ -11,11 +16,6 @@ import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.minecraft.util.Identifier;
 
-import java.util.Objects;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 public final class VehicleFrame implements VehicleComponent<VehicleFrame> {
     public static final Identifier ID = Motobox.id("frame");
     public static final SimpleMapContentRegistry<VehicleFrame> REGISTRY = new SimpleMapContentRegistry<>();
@@ -24,7 +24,10 @@ public final class VehicleFrame implements VehicleComponent<VehicleFrame> {
             new VehicleFrame(
                     Motobox.id("empty"),
                     0.25f,
+                    0x808080,
+                    0f,
                     new FrameModel(
+                            new Identifier("empty"),
                             new Identifier("empty"),
                             Motobox.id("empty"),
                             () -> WheelBase.basic(16, 16),
@@ -42,11 +45,20 @@ public final class VehicleFrame implements VehicleComponent<VehicleFrame> {
     public static final VehicleFrame MOTORBIKE = REGISTRY.register(motorbike());
 
     public static final VehicleFrame RUSTY_CAR = REGISTRY.register(rustyCar());
+    public static final VehicleFrame M3_CAR = REGISTRY.register(m3Car());
+    public static final VehicleFrame V8_CAR = REGISTRY.register(v8Car());
+    public static final VehicleFrame E1_CAR = REGISTRY.register(e1Car());
+    public static final VehicleFrame M3_CAR_VRD = REGISTRY.register(m3Car_vrd());
+    public static final VehicleFrame FastWind_2000 = REGISTRY.register(fastWind_2000());
+    public static final VehicleFrame Mach_5 = REGISTRY.register(mach_5());
     private static VehicleFrame truck() {
         return new VehicleFrame(
                 Motobox.id("truck"),
                 0.73f,
+                0x808080,
+                9576.96,
                 new FrameModel(
+                        Motobox.id("textures/entity/vehicle/frame/truck.png"),
                         Motobox.id("textures/entity/vehicle/frame/truck.png"),
                         Motobox.id("frame_truck"),
                         () -> new WheelBase(
@@ -69,7 +81,10 @@ public final class VehicleFrame implements VehicleComponent<VehicleFrame> {
         return new VehicleFrame(
                 Motobox.id("motorbike"),
                 0.34f,
+                0x808080,
+                4679.54,
                 new FrameModel(
+                        Motobox.id("textures/entity/vehicle/frame/motorbike.png"),
                         Motobox.id("textures/entity/vehicle/frame/motorbike.png"),
                         Motobox.id("frame_motorbike"),
                         () -> WheelBase.bicycleOffset(26, 1),
@@ -87,7 +102,10 @@ public final class VehicleFrame implements VehicleComponent<VehicleFrame> {
         return new VehicleFrame(
                 Motobox.id("rusty_car"),
                 0.84f,
+                0x808080,
+                6597.65,
                 new FrameModel(
+                        Motobox.id("textures/entity/vehicle/frame/rusty_car.png"),
                         Motobox.id("textures/entity/vehicle/frame/rusty_car.png"),
                         Motobox.id("frame_rusty_car"),
                         () -> new WheelBase(
@@ -106,21 +124,179 @@ public final class VehicleFrame implements VehicleComponent<VehicleFrame> {
         );
     }
 
+    private static VehicleFrame m3Car() {
+        return new VehicleFrame(
+                Motobox.id("veloce_m3"),
+                0.84f,
+                0x808080,
+                19489.76,
+                new FrameModel(
+                        Motobox.id("textures/entity/vehicle/frame/veloce_m3.png"),
+                        Motobox.id("textures/entity/vehicle/frame/veloce_m3.png"),
+                        Motobox.id("frame_veloce_m3"),
+                        () -> new WheelBase(
+                                new WheelBase.WheelPos(-28, -22f, 0.8f, 0, WheelBase.WheelEnd.BACK, WheelBase.WheelSide.LEFT),
+                                new WheelBase.WheelPos(-28, 13f, 0.8f, 180, WheelBase.WheelEnd.BACK, WheelBase.WheelSide.RIGHT),
+                                new WheelBase.WheelPos(34, -22f, 0.8f, 0, WheelBase.WheelEnd.FRONT, WheelBase.WheelSide.LEFT),
+                                new WheelBase.WheelPos(34, 13f, 0.8f, 180, WheelBase.WheelEnd.FRONT, WheelBase.WheelSide.RIGHT)
+                        ),
+                        () -> 28,
+                        () -> 5.6f,
+                        () -> -24.2f,
+                        () -> 6f,
+                        () -> 44,
+                        () -> 31
+                )
+        );
+    }
+    private static VehicleFrame v8Car() {
+        return new VehicleFrame(
+                Motobox.id("veloce_v8"),
+                0.84f,
+                0x808080,
+                419458.92,
+                new FrameModel(
+                        Motobox.id("textures/entity/vehicle/frame/v8.png"),
+                        Motobox.id("textures/entity/vehicle/frame/v8_mask.png"),
+                        Motobox.id("frame_veloce_v8"),
+                        () -> new WheelBase(
+                                new WheelBase.WheelPos(-34, -31f, 0.96f, 0, WheelBase.WheelEnd.BACK, WheelBase.WheelSide.LEFT),
+                                new WheelBase.WheelPos(-34, 6f, 0.96f, 180, WheelBase.WheelEnd.BACK, WheelBase.WheelSide.RIGHT),
+                                new WheelBase.WheelPos(32, -31f, 0.96f, 0, WheelBase.WheelEnd.FRONT, WheelBase.WheelSide.LEFT),
+                                new WheelBase.WheelPos(32, 6f, 0.96f, 180, WheelBase.WheelEnd.FRONT, WheelBase.WheelSide.RIGHT)
+                        ),
+                        () -> 28,
+                        () -> 3.6f,
+                        () -> 17.2f,
+                        () -> 5f,
+                        () -> 44,
+                        () -> 31
+                )
+        );
+    }
+
+            private static VehicleFrame e1Car() {
+            return new VehicleFrame(
+                Motobox.id("veloce_e1"),
+                0.84f,
+                0x808080,
+                109889,
+                new FrameModel(
+                    Motobox.id("textures/entity/vehicle/frame/veloce_e1.png"),
+                    Motobox.id("textures/entity/vehicle/frame/veloce_e1.png"),
+                    Motobox.id("frame_veloce_e1"),
+                    () -> new WheelBase(
+                        new WheelBase.WheelPos(-34.5f, -29f, 0.96f, 0, WheelBase.WheelEnd.BACK, WheelBase.WheelSide.LEFT),
+                        new WheelBase.WheelPos(-34.5f, 6f, 0.96f, 180, WheelBase.WheelEnd.BACK, WheelBase.WheelSide.RIGHT),
+                        new WheelBase.WheelPos(30, -29f, 0.96f, 0, WheelBase.WheelEnd.FRONT, WheelBase.WheelSide.LEFT),
+                        new WheelBase.WheelPos(30, 6f, 0.96f, 180, WheelBase.WheelEnd.FRONT, WheelBase.WheelSide.RIGHT)
+                    ),
+                    () -> 28,
+                    () -> 2.4f,
+                    () -> -17f,
+                    () -> 2f,
+                    () -> 44,
+                    () -> 31
+                )
+            );
+            }
+
+    private static VehicleFrame m3Car_vrd() {
+        return new VehicleFrame(
+                Motobox.id("veloce_m3_vrd"),
+                0.62f,
+                0x808080,
+                19489.76,
+                new FrameModel(
+                        Motobox.id("textures/entity/vehicle/frame/veloce_m3_vrd.png"),
+                        Motobox.id("textures/entity/vehicle/frame/veloce_m3_vrd.png"),
+                        Motobox.id("frame_veloce_m3_vrd"),
+                        () -> new WheelBase(
+                                new WheelBase.WheelPos(-24, -19f, 0.85f, 0, WheelBase.WheelEnd.BACK, WheelBase.WheelSide.LEFT),
+                                new WheelBase.WheelPos(-24, 10f, 0.85f, 180, WheelBase.WheelEnd.BACK, WheelBase.WheelSide.RIGHT),
+                                new WheelBase.WheelPos(29, -19f, 0.85f, 0, WheelBase.WheelEnd.FRONT, WheelBase.WheelSide.LEFT),
+                                new WheelBase.WheelPos(29, 10f, 0.85f, 180, WheelBase.WheelEnd.FRONT, WheelBase.WheelSide.RIGHT)
+                        ),
+                        () -> 28,
+                        () -> 0.0f,
+                        () -> -24.2f,
+                        () -> -2f,
+                        () -> 44,
+                        () -> 31
+                )
+        );
+    }
+    private static VehicleFrame fastWind_2000() {
+        return new VehicleFrame(
+                Motobox.id("fastwind_2000"),
+                0.62f,
+                0x808080,
+                164897.95,
+                new FrameModel(
+                        Motobox.id("textures/entity/vehicle/frame/fast2000.png"),
+                        Motobox.id("textures/entity/vehicle/frame/fast2000.png"),
+                        Motobox.id("frame_fastwind"),
+                        () -> new WheelBase(
+                                new WheelBase.WheelPos(-35, -24f, 0.88f, 0, WheelBase.WheelEnd.BACK, WheelBase.WheelSide.LEFT),
+                                new WheelBase.WheelPos(-35, 9f, 0.88f, 180, WheelBase.WheelEnd.BACK, WheelBase.WheelSide.RIGHT),
+                                new WheelBase.WheelPos(33, -23f, 0.88f, 0, WheelBase.WheelEnd.FRONT, WheelBase.WheelSide.LEFT),
+                                new WheelBase.WheelPos(33, 7f, 0.88f, 180, WheelBase.WheelEnd.FRONT, WheelBase.WheelSide.RIGHT)
+                        ),
+                        () -> 28,
+                        () -> 1.0f,
+                        () -> -24.2f,
+                        () -> -2f,
+                        () -> 44,
+                        () -> 31
+                )
+        );
+    }
+    private static VehicleFrame mach_5() {
+        return new VehicleFrame(
+                Motobox.id("mach_5"),
+                0.62f,
+                0x808080,
+                99999999.99,
+                new FrameModel(
+                        Motobox.id("textures/entity/vehicle/frame/mach5.png"),
+                        Motobox.id("textures/entity/vehicle/frame/mach5.png"),
+                        Motobox.id("frame_mach5"),
+                        () -> new WheelBase(
+                                new WheelBase.WheelPos(-22, -30f, 0.84f, 0, WheelBase.WheelEnd.BACK, WheelBase.WheelSide.LEFT),
+                                new WheelBase.WheelPos(-22, 12.8f, 0.84f, 180, WheelBase.WheelEnd.BACK, WheelBase.WheelSide.RIGHT),
+                                new WheelBase.WheelPos(44, -30f, 0.84f, 0, WheelBase.WheelEnd.FRONT, WheelBase.WheelSide.LEFT),
+                                new WheelBase.WheelPos(44, 12.8f, 0.84f, 180, WheelBase.WheelEnd.FRONT, WheelBase.WheelSide.RIGHT)
+                        ),
+                        () -> 28,
+                        () -> 1.0f,
+                        () -> 14.2f,
+                        () -> -2f,
+                        () -> 44,
+                        () -> 31
+                )
+        );
+    }
+
 
     public static final DisplayStat<VehicleFrame> STAT_WEIGHT = new DisplayStat<>("weight", VehicleFrame::weight);
+    public static final DisplayStat<VehicleFrame> STAT_PRICE = new DisplayStat<>("price", VehicleFrame::price);
     private final Identifier id;
     private final float weight;
+    private int color;
+    private final double price;
     private final FrameModel model;
     private final Supplier<FeatureSet> requiredFeatures;
 
-    public VehicleFrame(Identifier id, float weight, FrameModel model) {
-        this(id, weight, model, FeatureSet::empty);
+    public VehicleFrame(Identifier id, float weight, int color, double price, FrameModel model) {
+        this(id, weight, color, price, model, FeatureSet::empty);
     }
 
-    public VehicleFrame(Identifier id, float weight, FrameModel model, Supplier<FeatureSet> requiredFeatures) {
+    public VehicleFrame(Identifier id, float weight, int color, double price,  FrameModel model, Supplier<FeatureSet> requiredFeatures) {
         this.id = id;
         this.weight = weight;
+        this.color = color;
         this.model = model;
+        this.price = price;
         this.requiredFeatures = requiredFeatures;
     }
 
@@ -137,6 +313,7 @@ public final class VehicleFrame implements VehicleComponent<VehicleFrame> {
     @Override
     public void forEachStat(Consumer<DisplayStat<VehicleFrame>> action) {
         action.accept(STAT_WEIGHT);
+        action.accept(STAT_PRICE);
     }
 
     @Override
@@ -155,6 +332,16 @@ public final class VehicleFrame implements VehicleComponent<VehicleFrame> {
     public float weight() {
         return weight;
     }
+
+    public int color() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
+    }
+
+    public double price() { return price; }
 
     public FrameModel model() {
         return model;
@@ -192,6 +379,7 @@ public final class VehicleFrame implements VehicleComponent<VehicleFrame> {
     @SuppressWarnings("unused")
     public static final class FrameModel {
         private final Identifier texture;
+        private final Identifier mask;
         private final Identifier modelId;
         private final Supplier<WheelBase> wheelBase;
         private final FloatSupplier lengthPx;
@@ -204,6 +392,7 @@ public final class VehicleFrame implements VehicleComponent<VehicleFrame> {
         @Deprecated
         public FrameModel(
                 Identifier texture,
+                Identifier mask,
                 Identifier modelId,
                 Supplier<WheelBase> wheelBase,
                 FloatSupplier lengthPx,
@@ -214,6 +403,7 @@ public final class VehicleFrame implements VehicleComponent<VehicleFrame> {
                 FloatSupplier frontAttachmentPos
         ) {
             this.texture = texture;
+            this.mask = mask;
             this.modelId = modelId;
             this.wheelBase = wheelBase;
             this.lengthPx = lengthPx;
@@ -226,6 +416,7 @@ public final class VehicleFrame implements VehicleComponent<VehicleFrame> {
 
         public FrameModel(
                 Identifier texture,
+                Identifier mask,
                 Identifier modelId,
                 WheelBase wheelBase,
                 float lengthPx,
@@ -237,6 +428,7 @@ public final class VehicleFrame implements VehicleComponent<VehicleFrame> {
         ) {
             this(
                     texture,
+                    mask,
                     modelId,
                     () -> wheelBase,
                     FloatSupplier.direct(lengthPx),
@@ -255,6 +447,9 @@ public final class VehicleFrame implements VehicleComponent<VehicleFrame> {
 
         public Identifier texture() {
             return texture;
+        }
+        public Identifier mask() {
+            return mask;
         }
 
         public Identifier modelId() {

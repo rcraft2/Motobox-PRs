@@ -12,11 +12,11 @@ import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class RearAttachment extends BaseAttachment<RearAttachmentType<?>> {
-    private float lastYaw;
-    private float yaw;
+    protected float lastYaw;
+    protected float yaw;
 
-    private float trackedYaw;
-    private int yawLerpProgress;
+    protected float trackedYaw;
+    protected int yawLerpProgress;
 
     protected RearAttachment(RearAttachmentType<?> type, VehicleEntity entity) {
         super(type, entity);
@@ -27,7 +27,8 @@ public abstract class RearAttachment extends BaseAttachment<RearAttachmentType<?
     }
 
     public final Vec3d scaledYawVec() {
-        return this.yawVec().multiply(this.type.model().pivotDistPx().getFloat() * 0.0625);
+       // return this.yawVec().multiply(this.type.model().pivotDistPx().getFloat() * 0.0625);
+        return this.yawVec().multiply(this.type.model().pivotDistPx().getFloat() * 4.2);
     }
 
     public final Vec3d origin() {
@@ -65,11 +66,11 @@ public abstract class RearAttachment extends BaseAttachment<RearAttachmentType<?
         this.yawLerpProgress = this.vehicle.getType().getTrackTickInterval() + 1;
     }
 
-    protected final void updateTrackedAnimation(float animation) {
+    protected void updateTrackedAnimation(float animation) {
         this.vehicle.setTrackedRearAttachmentAnimation(animation);
     }
 
-    public final void pull(Vec3d movement) {
+    public void pull(Vec3d movement) {
         var vec = this.scaledYawVec().add(movement);
         this.setYaw(180 - (float) Math.toDegrees(Math.atan2(vec.x, vec.z)));
     }
@@ -80,7 +81,7 @@ public abstract class RearAttachment extends BaseAttachment<RearAttachmentType<?
         rotationTrackingTick();
     }
 
-    private void rotationTrackingTick() {
+    public void rotationTrackingTick() {
         if (!world().isClient()) {
             this.yawLerpProgress = 0;
             updateTrackedYaw(yaw());
