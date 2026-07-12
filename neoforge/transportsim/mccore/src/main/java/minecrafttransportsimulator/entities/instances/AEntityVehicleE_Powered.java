@@ -21,7 +21,6 @@ import minecrafttransportsimulator.mcinterface.InterfaceManager;
 import minecrafttransportsimulator.packets.instances.PacketPlayerChatMessage;
 import minecrafttransportsimulator.systems.ConfigSystem;
 import minecrafttransportsimulator.systems.LanguageSystem;
-import minecrafttransportsimulator.systems.StolenVehicleSystem;
 
 /**
  * This class adds engine components for vehicles, such as fuel, throttle,
@@ -57,7 +56,6 @@ public abstract class AEntityVehicleE_Powered extends AEntityVehicleD_Moving {
     public boolean enginesRunning;
     public boolean isCreative;
     public boolean hasReverseThrust;
-    private boolean autobodyReplacementQueued;
     public int gearMovementTime;
     public int ticksOutOfHealth;
     public double electricPower;
@@ -103,22 +101,6 @@ public abstract class AEntityVehicleE_Powered extends AEntityVehicleD_Moving {
     	addVariable(this.reverseThrustVar = new ComputedVariable(this, "reverser", data));
     	addVariable(this.electricUsageVar = new ComputedVariable(this, "electric_usage", data));
     	addVariable(this.batteryCapacityVar = new ComputedVariable(this, "batteryCapacity", data));
-    }
-
-    @Override
-    public void attack(minecrafttransportsimulator.baseclasses.Damage damage) {
-        boolean wasOutOfHealth = outOfHealth;
-        super.attack(damage);
-        if (!wasOutOfHealth && outOfHealth) {
-            queueAutobodyReplacement();
-        }
-    }
-
-    private void queueAutobodyReplacement() {
-        if (!autobodyReplacementQueued && !world.isClient() && !theftVehicle && ownerUUID != null && this instanceof EntityVehicleF_Physics) {
-            autobodyReplacementQueued = true;
-            StolenVehicleSystem.onVehicleDestroyed((EntityVehicleF_Physics) this);
-        }
     }
 
     @Override
@@ -229,9 +211,6 @@ public abstract class AEntityVehicleE_Powered extends AEntityVehicleD_Moving {
 
     @Override
     public void destroy(BoundingBox box) {
-        //Hard-destroyed vehicles may skip the normal totaled transition, so keep this fallback hook.
-        queueAutobodyReplacement();
-
         //Spawn instruments in the world.
         for (ItemInstrument instrument : instruments) {
             if (instrument != null) {

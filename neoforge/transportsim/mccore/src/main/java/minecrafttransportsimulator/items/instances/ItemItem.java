@@ -417,6 +417,7 @@ public class ItemItem extends AItemPack<JSONItem> implements IItemEntityInteract
                                 InterfaceManager.packetInterface.sendToPlayer(new PacketPlayerChatMessage(player, LanguageSystem.INTERACT_REPAIR_NONEED), player);
                                 return CallbackType.NONE;
                             } else {
+                                boolean wasTotaled = entity.outOfHealth;
                                 double amountRepaired = definition.repair.amount;
                                 if (entity.damageVar.currentValue < amountRepaired) {
                                     amountRepaired = entity.damageVar.currentValue;
@@ -426,6 +427,23 @@ public class ItemItem extends AItemPack<JSONItem> implements IItemEntityInteract
                                 entity.outOfHealth = newDamage == entity.definition.general.health && entity.definition.general.health != 0;
                                 if (entity instanceof PartEngine) {
                                     ((PartEngine) entity).hoursVar.setTo(0, true);
+                                }
+                                //Un-totaling a whole vehicle must also revive its parts (e.g. the engine) and
+                                //restore battery charge.  Otherwise the body heals but the engine stays out of
+                                //health (its start gate checks both its own and the vehicle's outOfHealth) and
+                                //the battery stays drained, so the player can sit in the seat but never drive.
+                                if (wasTotaled && entity instanceof EntityVehicleF_Physics) {
+                                    EntityVehicleF_Physics vehicleToRevive = (EntityVehicleF_Physics) entity;
+                                    for (APart part : vehicleToRevive.allParts) {
+                                        if (part.outOfHealth) {
+                                            part.damageVar.setTo(0, true);
+                                            part.outOfHealth = false;
+                                            if (part instanceof PartEngine) {
+                                                ((PartEngine) part).hoursVar.setTo(0, true);
+                                            }
+                                        }
+                                    }
+                                    vehicleToRevive.electricPower = vehicleToRevive.batteryCapacityVar.currentValue * AEntityVehicleE_Powered.BATTERY_DEFAULT_CHARGE;
                                 }
                                 entity.repairCooldownTicks = 200;
                                 InterfaceManager.packetInterface.sendToPlayer(new PacketPlayerChatMessage(player, LanguageSystem.INTERACT_REPAIR_PASS, new Object[] { amountRepaired, entity.definition.general.health - newDamage, entity.definition.general.health }), player);

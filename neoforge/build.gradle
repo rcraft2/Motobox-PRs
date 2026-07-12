@@ -74,3 +74,15 @@ publishing {
         }
     }
 }
+
+def transportWrapper = System.getProperty("os.name").toLowerCase().contains("windows") ? "gradlew.bat" : "./gradlew"
+
+// Convenience wrapper: the Immersive Vehicles (transportsim) source is a separate
+// standalone Gradle build, so its tasks aren't visible to this project. This shells
+// into it and runs deployToRun, which builds the 1.21.1 jar and copies it into run/mods.
+tasks.register("deployToRun", Exec) {
+    group = "neoforge"
+    description = "Builds the Immersive Vehicles 1.21.1 jar and copies it into run/mods for testing."
+    workingDir = file("transportsim")
+    commandLine transportWrapper, "deployToRun"
+}

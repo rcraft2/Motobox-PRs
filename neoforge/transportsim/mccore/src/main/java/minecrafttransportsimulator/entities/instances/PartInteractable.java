@@ -173,7 +173,9 @@ public final class PartInteractable extends APart {
         if (explosivePower > 0 && isValid) {
             super.destroy(box);
             if (!definition.interactable.hasBlowoutPanels) {
-                masterEntity.destroy(masterEntity.boundingBox);
+                //Hard-destroy removed: a destroyed fuel/explosive part no longer blows up and
+                //despawns the whole vehicle.  It still explodes (which can total the vehicle into a
+                //repairable wreck), but the vehicle itself survives.
                 if (ConfigSystem.settings.damage.vehicleExplosions.value) {
                     world.spawnExplosion(position, explosivePower, ConfigSystem.settings.damage.vehicleBlockBreaking.value, ConfigSystem.settings.damage.vehicleBlockBreaking.value);
                 } else {
