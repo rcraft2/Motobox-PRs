@@ -418,11 +418,12 @@ public class ItemItem extends AItemPack<JSONItem> implements IItemEntityInteract
                                 return CallbackType.NONE;
                             } else {
                                 double amountRepaired = definition.repair.amount;
-                                if (vehicle.damageVar.currentValue < amountRepaired) {
+                                if (entity.damageVar.currentValue < amountRepaired) {
                                     amountRepaired = entity.damageVar.currentValue;
                                 }
                                 double newDamage = entity.damageVar.currentValue - amountRepaired;
                                 entity.damageVar.setTo(newDamage, true);
+                                entity.outOfHealth = newDamage == entity.definition.general.health && entity.definition.general.health != 0;
                                 if (entity instanceof PartEngine) {
                                     ((PartEngine) entity).hoursVar.setTo(0, true);
                                 }

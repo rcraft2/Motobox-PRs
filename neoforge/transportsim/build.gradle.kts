@@ -2,6 +2,7 @@ import java.nio.file.Paths
 import kotlin.io.path.moveTo
 import kotlin.io.path.ExperimentalPathApi
 import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 
 
 plugins {
@@ -93,6 +94,25 @@ tasks.register<Exec>("buildForge1211") {
     )
     doLast {
         moveToOut("mcinterfaceneoforge1211", "1.21.1-$modVersion")
+    }
+}
+
+tasks.register("deployToRun") {
+    group = "neoforge"
+    description = "Builds the NeoForge 1.21.1 Immersive Vehicles jar and copies it into the run/mods folder for testing, replacing any previous copy."
+    dependsOn(tasks.getByName("buildForge1211"))
+    doLast {
+        val jarName = "Immersive Vehicles-1.21.1-$modVersion.jar"
+        val builtJar = Paths.get("${project.projectDir.canonicalPath}/out/$jarName")
+        // build.gradle.kts is neoforge/transportsim; the NeoForge run working dir is repo-root/run.
+        val modsDir = Paths.get("${project.projectDir.canonicalPath}/../../run/mods").normalize()
+        Files.createDirectories(modsDir)
+        // Remove any previously deployed Immersive Vehicles jars so the game never loads two versions.
+        Files.newDirectoryStream(modsDir, "Immersive Vehicles-*.jar").use { stream ->
+            stream.forEach { Files.deleteIfExists(it) }
+        }
+        Files.copy(builtJar, modsDir.resolve(jarName), StandardCopyOption.REPLACE_EXISTING)
+        println("Deployed $jarName -> $modsDir")
     }
 }
 
