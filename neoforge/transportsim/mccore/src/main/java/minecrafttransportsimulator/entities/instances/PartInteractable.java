@@ -148,13 +148,9 @@ public final class PartInteractable extends APart {
         }
     }
 
-    @Override
-    public void attack(Damage damage) {
-        super.attack(damage);
-        if (!damage.isWater && damage.amount > 25 && (!outOfHealth || definition.generic.destroyable)) {
-            destroy(damage.box);
-        }
-    }
+    //Big hits used to instantly destroy the container part (knocking it off / exploding).  We removed this
+    //override so the normal health-based logic in APart#attack applies instead: the part deactivates in place
+    //and the vehicle totals (turns black) and can be repaired, rather than exploding into parts.
 
     @Override
     public void remove() {

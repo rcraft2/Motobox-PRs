@@ -264,6 +264,13 @@ public final class StolenVehicleSystem {
             }
 
             AEntityA_Base entity = world.getEntity(vehicleUUID);
+            if (entity == null) {
+                //Entity isn't currently loaded (its chunk may be unloaded).  Do NOT delete the
+                //tracking entry - the vehicle likely still exists on disk.  Deleting it here would
+                //orphan the vehicle so it never de-spawns and stays locked forever.  We retry on a
+                //later tick once the chunk (and vehicle) is loaded again.
+                continue;
+            }
             if (!(entity instanceof EntityVehicleF_Physics)) {
                 activeData.deleteEntry(uuidString);
                 modified = true;
@@ -306,6 +313,13 @@ public final class StolenVehicleSystem {
             }
 
             AEntityA_Base entity = world.getEntity(vehicleUUID);
+            if (entity == null) {
+                //Entity isn't currently loaded (its chunk may be unloaded).  Do NOT delete the
+                //tracking entry - the vehicle likely still exists on disk.  Deleting it here would
+                //orphan the vehicle so it never de-spawns and stays locked forever.  We retry on a
+                //later tick once the chunk (and vehicle) is loaded again.
+                continue;
+            }
             if (!(entity instanceof EntityVehicleF_Physics)) {
                 activeData.deleteEntry(uuidString);
                 modified = true;

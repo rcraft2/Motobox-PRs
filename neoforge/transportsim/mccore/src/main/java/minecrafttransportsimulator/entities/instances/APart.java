@@ -339,14 +339,11 @@ public abstract class APart extends AEntityF_Multipart<JSONPart> {
                 masterEntity.attack(new Damage(damage, definition.generic.forwardsDamageMultiplier, null));
             }
             if (outOfHealth) {
-                if (definition.generic.destroyable) {
-                    destroy(damage.box);
-                    world.spawnExplosion(position, 0F, false, false);
-                } else {
-                    isActiveVar.setActive(false, false);
-                    if (rider != null) {
-                        removeRider();
-                    }
+                //Don't destroy/knock the part off (exploding into pieces).  Total the whole vehicle instead,
+                //so it turns black and can be repaired.  The part's own outOfHealth state disables its
+                //function until the vehicle is repaired (which clears it), so we leave the part in place.
+                if (masterEntity.definition.general.health != 0) {
+                    masterEntity.attack(new Damage(masterEntity.definition.general.health, null, null, null, null));
                 }
             }
         }

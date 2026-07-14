@@ -1096,18 +1096,16 @@ abstract class AEntityVehicleD_Moving extends AEntityVehicleC_Colliding {
                 //Use crash speed if defined, otherwise use default auto-hardness logic.
                 if (!world.isClient()) {
                     if (ConfigSystem.settings.damage.vehicleDestruction.value) {
-                        boolean destroyThisHit = false;
+                        boolean totalThisHit = false;
                         if (definition.motorized.crashSpeedMax > 0) {
                             if (hitBlock) {
                                 double scaledVelocity = velocity * 20;
                                 if (crashDebounce == 0 && scaledVelocity > definition.motorized.crashSpeedMin) {
                                     double damage = definition.general.health * (scaledVelocity - definition.motorized.crashSpeedMin) / (definition.motorized.crashSpeedMax - definition.motorized.crashSpeedMin) * ConfigSystem.settings.damage.blockCrashDamageFactor.value;
                                     if (damage >= definition.general.health) {
-                                        if (scaledVelocity > definition.motorized.crashSpeedDestroyed) {
-                                            destroyThisHit = true;
-                                        } else {
-                                            attack(new Damage(definition.general.health, null, null, null, null));
-                                        }
+                                        //Lethal crash: total the vehicle (turn it black/repairable) instead of
+                                        //destroying it into parts, regardless of crash speed.
+                                        totalThisHit = true;
                                     } else {
                                         attack(new Damage(damage, null, null, null, null));
                                     }
@@ -1116,17 +1114,11 @@ abstract class AEntityVehicleD_Moving extends AEntityVehicleC_Colliding {
                                 }
                             }
                         } else if (hardnessHitThisTick > currentMass / (0.75 + velocity) / 250F) {
-                            destroyThisHit = true;
+                            //Legacy crash path (vehicle defines no crashSpeed): total instead of destroying into parts.
+                            totalThisHit = true;
                         }
-                        if (destroyThisHit) {
-                            APart partHit = getPartWithBox(box);
-                            if (partHit != null) {
-                                hardnessHitThisTick -= hardnessHitThisBox;
-                                partHit.remove();
-                            } else {
-                                destroy(box);
-                                return false;
-                            }
+                        if (totalThisHit) {
+                            attack(new Damage(definition.general.health, null, null, null, null));
                         }
                     }
                 }
